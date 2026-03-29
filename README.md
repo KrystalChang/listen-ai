@@ -10,7 +10,7 @@ A lightweight multi-service social listening platform with:
 
 ## Architecture
 
-- `frontend` (Streamlit): user input and dashboard rendering
+- `frontend` (Python/Streamlit): user input and dashboard rendering
 - `gateway` (Node.js): authentication and request routing/composition
 - `nlp` (Python/FastAPI): sentiment detection from post text
 - `stat` (Go): mentions, trends, top keywords, post retrieval
