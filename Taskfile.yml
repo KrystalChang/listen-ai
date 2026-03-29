@@ -1,6 +1,19 @@
 version: '3'
 
 tasks:
+  cleanup:
+    desc: Kill processes using service ports
+    cmds:
+    - |
+      PORTS="${PORTS:-8000,8001,8002,8501}"
+      pids=$(lsof -t -nP -iTCP:$PORTS -sTCP:LISTEN 2>/dev/null | tr '\n' ' ')
+      if [ -n "$pids" ]; then
+        echo "Stopping processes on ports: $PORTS"
+        kill $pids
+      else
+        echo "No listening processes found on ports: $PORTS"
+      fi
+
   stat:
     desc: Run stat service
     dir: ./stat
@@ -80,10 +93,16 @@ tasks:
       fi
       .venv/bin/python -m streamlit run app.py --server.port 8501
 
-  up:
-    desc: Run all services together
+  start:
+    desc: Start all services together
     deps:
     - stat
     - nlp
     - gateway
     - frontend
+
+  up:
+    desc: Cleanup ports then run all services together
+    cmds:
+    - task: cleanup
+    - task: start
