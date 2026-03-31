@@ -1,0 +1,61 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: listenai-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      GATEWAY_URL: http://gateway:8000
+    depends_on:
+      - gateway
+    networks:
+      - listenai-network
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: listenai-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      GATEWAY_PORT: 8000
+      STAT_URL: http://stat:8002
+      NLP_URL: http://nlp:8001
+      JWT_SECRET: supersecret
+      DEMO_USER: admin
+      DEMO_PASS: admin123
+    depends_on:
+      - stat
+      - nlp
+    networks:
+      - listenai-network
+
+  nlp:
+    build:
+      context: ./nlp
+    container_name: listenai-nlp
+    ports:
+      - "8001:8001"
+    environment:
+      NLP_PORT: 8001
+    networks:
+      - listenai-network
+
+  stat:
+    build:
+      context: ./stat
+    container_name: listenai-stat
+    ports:
+      - "8002:8002"
+    environment:
+      STAT_PORT: 8002
+      SQLITE_PATH: /data/listenai.db
+    volumes:
+      - ./data:/data
+    networks:
+      - listenai-network
+
+networks:
+  listenai-network:
+    driver: bridge
